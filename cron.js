@@ -10,4 +10,4 @@ const job = new cron.CronJob("*/14 * * * *", function () {
     .on("error", (e) => console.error("Error while Sending request", e));
 });
 
-export default job;
+module.exports = job;

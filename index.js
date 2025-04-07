@@ -1,7 +1,7 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
-const { default: job } = require("./cron");
+const job = require("./cron");
 
 const uri =
   "mongodb+srv://jatin:nullclass@twiller.xooswpu.mongodb.net/?retryWrites=true&w=majority&appName=Twiller";
