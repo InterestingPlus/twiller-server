@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const job = require("./cron");
@@ -77,6 +77,24 @@ async function run() {
       };
 
       const result = await userCollection.updateOne(filter, updateDoc, options);
+
+      res.send(result);
+    });
+
+    app.patch("/likeupdate/:_id", async (req, res) => {
+      const { _id } = req.params;
+      const profile = req.body;
+
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: profile,
+      };
+
+      const result = await postCollection.updateOne(
+        { _id: new ObjectId(_id) },
+        updateDoc,
+        options
+      );
 
       res.send(result);
     });
