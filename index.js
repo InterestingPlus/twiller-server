@@ -89,21 +89,40 @@ async function run() {
     });
 
     app.patch("/likeupdate/:_id", async (req, res) => {
-      const { _id } = req.params;
-      const profile = req.body;
+      const { email } = req.body;
 
-      const options = { upsert: true };
-      const updateDoc = {
-        $set: profile,
-      };
+      try {
+        const post = await postCollection.findOne({
+          _id: new ObjectId(req.params._id),
+        });
 
-      const result = await postCollection.updateOne(
-        { _id: new ObjectId(_id) },
-        updateDoc,
-        options
-      );
+        if (!post) return res.status(404).json({ error: "Post not found" });
 
-      res.send(result);
+        let updatedLikes;
+
+        const alreadyLiked = post?.likes?.find((like) => like.email === email);
+
+        if (alreadyLiked) {
+          // UNLIKE the post
+          updatedLikes = post.likes.filter((like) => like.email !== email);
+        } else {
+          // LIKE the post
+          updatedLikes = [...(post.likes || []), { email }];
+        }
+
+        // Perform the update
+        await postCollection.updateOne(
+          { _id: new ObjectId(req.params._id) },
+          { $set: { likes: updatedLikes } }
+        );
+
+        res
+          .status(200)
+          .json({ success: true, likesCount: updatedLikes.length });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Something went wrong" });
+      }
     });
 
     console.log("Database Connected Successfully!");
